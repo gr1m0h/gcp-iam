@@ -32,7 +32,7 @@ jobs:
           tf_actions_subcommand: 'fmt'
           tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
           tf_actions_comment: false
-        
+
       - name: 'Terraform Init'
         uses: hashicorp/terraform-github-actions@master
         with:
@@ -40,8 +40,10 @@ jobs:
           tf_actions_subcommand: 'init'
           tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
           tf_actions_comment: false
-          args: '-backend=true -backend-config="role_arn=${{ env.AWS_BACKEND_ROLE_ARN }}" -backend-config="bucket=${{ env.BUCKEND_BUCKET }}" -backend-config="key=${{ GITHUB_REPOSITORY }}/terraform.tfstate" -backend-config="region=${{ env.BACKEND_REGION }}"'
-       
+          args: '-backend=true -backend-config="role_arn=${{ env.AWS_BACKEND_ROLE_ARN }}" -backend-config="bucket=${{ env.BUCKEND_BUCKET }}" -backend-config="key=${{ github.repository }}/terraform.tfstate" -backend-config="region=${{ env.BACKEND_REGION }}"'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 'Terraform Apply'
         uses: hashicorp/terraform-github-actions@master
         with:
@@ -50,3 +52,5 @@ jobs:
           tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
           tf_actions_comment: false
           args: 'TF_VAR_region=${{ env.REGION }} TF_VAR_project_name=${{ env.PROJECT_NAME }} TF_VAR_project_id=${{ env.PROJECT_ID }} TF_VAR_google_group_email=${{ env.GOOGLE_GROUP_EMAIL }}'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
