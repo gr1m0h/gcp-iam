@@ -1,0 +1,52 @@
+name: terraform apply on master push
+
+on:
+  push:
+    branches: [ master ]
+
+env:
+  TF_VERSION: 0.12.24
+  TF_WORKING_DIR: .
+  REGION: asia-northeast1
+  PROJECT_NAME: ${{ secrets.GCP_PROJECT_NAME }}
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GOOGLE_GROUP_EMAIL: ${{ secrets.GOOGLE_GROUP_EMAIL }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  BACKEND_ROLE_ARN: ${{ secrets.AWS_BACKEND_ROLE_ARN }}
+  BUCKEND_BUCKET: ${{ secrets.AWS_BACKEND_BUCKET }}
+  BACKEND_REGION: ap-northeast-1
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v2
+
+      - name: 'Terraform Format'
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ env.TF_VERSION }}
+          tf_actions_subcommand: 'fmt'
+          tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
+          tf_actions_comment: false
+        
+      - name: 'Terraform Init'
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ env.TF_VERSION }}
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
+          tf_actions_comment: false
+          args: '-backend=true -backend-config="role_arn=${{ env.AWS_BACKEND_ROLE_ARN }}" -backend-config="bucket=${{ env.BUCKEND_BUCKET }}" -backend-config="key=${{ GITHUB_REPOSITORY }}/terraform.tfstate" -backend-config="region=${{ env.BACKEND_REGION }}"'
+       
+      - name: 'Terraform Apply'
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: ${{ env.TF_VERSION }}
+          tf_actions_subcommand: 'apply'
+          tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
+          tf_actions_comment: false
+          args: 'TF_VAR_region=${{ env.REGION }} TF_VAR_project_name=${{ env.PROJECT_NAME }} TF_VAR_project_id=${{ env.PROJECT_ID }} TF_VAR_google_group_email=${{ env.GOOGLE_GROUP_EMAIL }}'
