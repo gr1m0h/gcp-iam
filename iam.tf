@@ -1,5 +1,12 @@
-resource "google_project_iam_member" "grimoh" {
-  project = var.project_id
-  role    = "roles/editor"
-  member  = "group:${var.google_group_email}"
+module "projects_iam_bindings" {
+  source  = "terraform-google-modules/iam/google//modules/projects_iam"
+  version = "~> 6.1"
+
+  projects = [var.project_id]
+
+  bindings = {
+    "roles/editor" = [
+      "group:${var.google_group_email}",
+    ]
+  }
 }
