@@ -39,6 +39,7 @@ jobs:
           args: '-backend=true -backend-config="role_arn=${{ env.AWS_BACKEND_ROLE_ARN }}" -backend-config="bucket=${{ env.BUCKEND_BUCKET }}" -backend-config="key=${{ github.repository }}/terraform.tfstate" -backend-config="region=${{ env.BACKEND_REGION }}"'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
 
       - name: 'Terraform Apply'
         uses: hashicorp/terraform-github-actions@master
@@ -50,3 +51,4 @@ jobs:
           args: '-var-file=variables.tfvars'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
