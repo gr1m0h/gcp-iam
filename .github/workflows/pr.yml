@@ -3,14 +3,10 @@ name: terraform init, fmt, validate and plan on PR
 on:
   pull_request:
     branches: [ master ]
-    
+
 env:
   TF_VERSION: 0.12.24
   TF_WORKING_DIR: .
-  REGION: asia-northeast1
-  PROJECT_NAME: ${{ secrets.GCP_PROJECT_NAME }}
-  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GOOGLE_GROUP_EMAIL: ${{ secrets.GOOGLE_GROUP_EMAIL }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   BACKEND_ROLE_ARN: ${{ secrets.AWS_BACKEND_ROLE_ARN }}
@@ -31,30 +27,40 @@ jobs:
           tf_actions_version: ${{ env.TF_VERSION }}
           tf_actions_subcommand: 'fmt'
           tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
-          tf_actions_comment: false
-        
+          tf_actions_comment: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 'Terraform Init'
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: ${{ env.TF_VERSION }}
           tf_actions_subcommand: 'init'
           tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
-          tf_actions_comment: false
-          args: '-backend=true -backend-config="role_arn=${{ env.AWS_BACKEND_ROLE_ARN }}" -backend-config="bucket=${{ env.BUCKEND_BUCKET }}" -backend-config="key=${{ GITHUB_REPOSITORY }}/terraform.tfstate" -backend-config="region=${{ env.BACKEND_REGION }}"'
-       
+          tf_actions_comment: true
+          args: '-backend=true -backend-config="role_arn=${{ env.AWS_BACKEND_ROLE_ARN }}" -backend-config="bucket=${{ env.BUCKEND_BUCKET }}" -backend-config="key=${{ github.repository }}/terraform.tfstate" -backend-config="region=${{ env.BACKEND_REGION }}"'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
+
       - name: 'Terraform Validate'
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: ${{ env.TF_VERSION }}
           tf_actions_subcommand: 'validate'
           tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
-          tf_actions_comment: false
-          
+          tf_actions_comment: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: 'Terraform Plan'
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: ${{ env.TF_VERSION }}
-          tf_actions_subcommand: 'apply'
+          tf_actions_subcommand: 'plan'
           tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
-          tf_actions_comment: false
-          args: 'TF_VAR_region=${{ env.REGION }} TF_VAR_project_name=${{ env.PROJECT_NAME }} TF_VAR_project_id=${{ env.PROJECT_ID }} TF_VAR_google_group_email=${{ env.GOOGLE_GROUP_EMAIL }}'
+          tf_actions_comment: true
+          args: '-var-file=variables.tfvars'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
