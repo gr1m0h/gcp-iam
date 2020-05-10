@@ -5,7 +5,7 @@ module "projects_iam_bindings" {
   projects = [var.project_id]
 
   bindings = {
-    "roles/editor" = [
+    "roles/viewer" = [
       "group:${var.google_group_email}",
     ]
   }
