@@ -7,6 +7,8 @@ on:
 env:
   TF_VERSION: 0.12.24
   TF_WORKING_DIR: .
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GOOGLE_GROUP_EMAIL: ${{ secrets.GOOGLE_GROUP_EMAIL }}
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   BACKEND_ROLE_ARN: ${{ secrets.AWS_BACKEND_ROLE_ARN }}
@@ -48,7 +50,7 @@ jobs:
           tf_actions_subcommand: 'apply'
           tf_actions_working_dir: ${{ env.TF_WORKING_DIR }}
           tf_actions_comment: false
-          args: '-var-file=variables.tfvars'
+          args: '-var=project_id=${{ env.GCP_PROJECT_ID }} -var=google_group_email=${{ env.GOOGLE_GROUP_EMAIL }} -var-file=variables.tfvars'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}
