@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 env:
-  TF_VERSION: 0.12.24
+  TF_VERSION: 0.13
   TF_WORKING_DIR: .
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GOOGLE_GROUP_EMAIL: ${{ secrets.GOOGLE_GROUP_EMAIL }}
