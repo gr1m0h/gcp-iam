@@ -2,7 +2,7 @@ name: terraform apply on master push
 
 on:
   push:
-    branches: [ master ]
+    branches: [ main ]
 
 env:
   TF_VERSION: 0.12.24
